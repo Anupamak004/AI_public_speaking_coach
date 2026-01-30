@@ -1,0 +1,8 @@
+opencv-python>=4.10.0
+mediapipe>=0.10.31
+deepface>=0.0.96
+numpy>=1.26.0
+scipy>=1.15.0
+tf-keras
+protobuf==5.29.0  # Critical: Fixes conflict between TensorFlow and MediaPipe
+tensorflow>=2.16.0
