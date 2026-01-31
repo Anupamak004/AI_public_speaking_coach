@@ -1,0 +1,10 @@
+torch
+whisper-timestamped
+moviepy
+librosa
+soundfile
+numpy
+nltk
+spacy
+textstat
+language-tool-python
