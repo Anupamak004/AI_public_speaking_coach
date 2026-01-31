@@ -30,3 +30,6 @@ outputs/
 .DS_Store
 
 src/models/*.task
+
+
+/data/
