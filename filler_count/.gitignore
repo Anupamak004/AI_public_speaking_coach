@@ -1,0 +1,26 @@
+# Virtual Environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+
+# VS Code
+.vscode/
+
+# OS junk
+.DS_Store
+
+data/audio/
+*.wav
+
+
+data/video/
+*.mp4
+
+
+output/
+*.json
