@@ -20,3 +20,6 @@ src/models/
 .*task
 
 /outputs
+
+data/audio/
+data/videos/
