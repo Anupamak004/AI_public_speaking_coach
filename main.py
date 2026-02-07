@@ -13,6 +13,7 @@ from src.eye_gaze import EyeGazeAnalysis
 from src.pose_gesture import PoseGestureAnalysis
 from src.aggregator import Aggregator
 from src.feedback_generator import FeedbackGenerator
+from src.fusion_vector import build_fusion_vector
 
 # Logging
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -105,6 +106,10 @@ def main():
     logger.info(f"FINAL EYE METRICS: {eye_metrics}")
 
     stats = aggregator.get_aggregated_stats()
+
+    fusion_vector = build_fusion_vector(stats)
+    logger.info(f"FUSION VECTOR ({len(fusion_vector)} dims): {fusion_vector}")
+
 
     # 🔒 SINGLE SOURCE OF TRUTH
     stats["video_duration_sec"] = eye_metrics["video_duration_sec"]
