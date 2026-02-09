@@ -20,27 +20,18 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
 
 
-def main():
-    # ---------------- ARGUMENTS ----------------
-    parser = argparse.ArgumentParser(description="Public Speaking Video Analysis")
-    parser.add_argument("--video", required=True, help="Path to input video")
-    parser.add_argument("--output_dir", default="outputs", help="Output directory")
-    args = parser.parse_args()
-
-    video_path = args.video
-    output_dir = args.output_dir
-
+# =========================================================
+# ✅ REUSABLE VIDEO PIPELINE (FOR MULTIMODAL FUSION)
+# =========================================================
+def run_video_pipeline(video_path, output_dir="outputs"):
     if not os.path.exists(video_path):
-        logger.error(f"Video not found: {video_path}")
-        sys.exit(1)
+        raise FileNotFoundError(f"Video not found: {video_path}")
 
     # ---------------- VIDEO READER ----------------
-    # 🔥 CHANGE HERE: Increase FPS for accurate blink detection
     reader = VideoReader(video_path, target_fps=15)
 
     info = reader.get_info()
-    video_duration_sec = info["duration_sec"]  # authoritative duration
-    logger.info(f"Video Duration: {video_duration_sec:.2f}s")
+    video_duration_sec = info["duration_sec"]
 
     # ---------------- ANALYZERS ----------------
     face_analyzer = FaceAnalysis()
@@ -52,12 +43,10 @@ def main():
     aggregator = Aggregator()
 
     # ---------------- CALIBRATION ----------------
-    CALIBRATION_FRAMES = 30  # 2 seconds @ 15 FPS
+    CALIBRATION_FRAMES = 30
     calibration_ratios = []
     calibration_data = None
     calibration_done = False
-
-    logger.info("Starting analysis pipeline...")
 
     # ---------------- FRAME LOOP ----------------
     for frame_idx, frame in reader.get_frames():
@@ -81,12 +70,10 @@ def main():
             # ---- CALIBRATION ----
             if not calibration_done and gaze_res:
                 calibration_ratios.append(gaze_res["raw_ratio"])
-
                 if len(calibration_ratios) >= CALIBRATION_FRAMES:
                     baseline = sum(calibration_ratios) / len(calibration_ratios)
                     calibration_data = {"iris_ratio": baseline}
                     calibration_done = True
-                    logger.info(f"Calibration complete. Iris baseline: {baseline:.3f}")
 
         # ---- EMOTION (1 FPS equivalent) ----
         if frame_idx % 15 == 0:
@@ -103,27 +90,46 @@ def main():
 
     # ---------------- FINAL METRICS ----------------
     eye_metrics = eye_analyzer.get_final_metrics(video_duration_sec)
-    logger.info(f"FINAL EYE METRICS: {eye_metrics}")
-
     stats = aggregator.get_aggregated_stats()
 
     fusion_vector = build_fusion_vector(stats)
-    logger.info(f"FUSION VECTOR ({len(fusion_vector)} dims): {fusion_vector}")
-
 
     # 🔒 SINGLE SOURCE OF TRUTH
     stats["video_duration_sec"] = eye_metrics["video_duration_sec"]
     stats["blink_rate_per_min"] = eye_metrics["blink_rate_per_min"]
     stats["total_blinks"] = eye_metrics["total_blinks"]
 
-    # ---------------- REPORT ----------------
-    feedback_gen = FeedbackGenerator(output_dir)
-    feedback_gen.generate_report(stats)
-    feedback_gen.generate_text_feedback(
-        feedback_gen.calculate_scores(stats)
+    return {
+        "video_vector": fusion_vector,
+        "video_stats": stats
+    }
+
+
+# =========================================================
+# ✅ CLI ENTRY POINT (UNCHANGED USER EXPERIENCE)
+# =========================================================
+def main():
+    parser = argparse.ArgumentParser(description="Public Speaking Video Analysis")
+    parser.add_argument("--video", required=True, help="Path to input video")
+    parser.add_argument("--output_dir", default="outputs", help="Output directory")
+    args = parser.parse_args()
+
+    logger.info("Starting analysis pipeline...")
+    result = run_video_pipeline(args.video, args.output_dir)
+
+    logger.info(
+        f"FUSION VECTOR ({len(result['video_vector'])} dims): "
+        f"{result['video_vector']}"
     )
 
-    logger.info(f"Analysis complete. Results saved to '{output_dir}'")
+    # ---------------- REPORT ----------------
+    feedback_gen = FeedbackGenerator(args.output_dir)
+    feedback_gen.generate_report(result["video_stats"])
+    feedback_gen.generate_text_feedback(
+        feedback_gen.calculate_scores(result["video_stats"])
+    )
+
+    logger.info(f"Analysis complete. Results saved to '{args.output_dir}'")
 
 
 if __name__ == "__main__":

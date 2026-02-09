@@ -8,3 +8,6 @@ nltk
 spacy
 textstat
 language-tool-python
+webrtcvad-wheels
+language-tool-python
+

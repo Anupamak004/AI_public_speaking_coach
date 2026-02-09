@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Virtual Environment
 venv/
 
@@ -60,4 +59,5 @@ src/models/*.task
 
 
 /data/
->>>>>>> video-module-clean
+
+*.csv

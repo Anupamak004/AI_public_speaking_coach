@@ -2,6 +2,9 @@ import numpy as np
 import librosa
 from moviepy import VideoFileClip
 from pathlib import Path
+import json
+import os
+
 
 import parselmouth
 import parselmouth.praat as praat
@@ -146,3 +149,56 @@ if __name__ == "__main__":
     print("\n--- LIBROSA FEATURES (Praat-like) ---")
     for k, v in librosa_features.items():
         print(f"{k}: {v}")
+        
+
+def to_serializable(obj):
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, (np.float32, np.float64)):
+        return float(obj)
+    elif isinstance(obj, (np.int32, np.int64)):
+        return int(obj)
+    return obj
+
+
+def save_json(data, path):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as f:
+        json.dump(data, f, indent=4, default=to_serializable)
+        
+
+def run_audio_pipeline(video_path):
+    audio_path = "data/audio/temp_audio.wav"
+
+    extract_audio(video_path, audio_path)
+
+    praat_features = extract_praat_features(audio_path)
+    librosa_features = extract_librosa_features(audio_path)
+
+    # Save ALL features (for analysis / debugging)
+    audio_stats = {**praat_features, **librosa_features}
+    save_json(audio_stats, "outputs/audio_stats.json")
+
+    # ✅ ONLY ESSENTIAL FEATURES FOR FUSION
+    audio_vector = np.concatenate([
+        np.array([
+            # Praat – confidence & nervousness
+            praat_features["praat_mean_pitch"],
+            praat_features["praat_pitch_std"],
+            praat_features["praat_mean_energy"],
+            praat_features["praat_energy_std"],
+            praat_features["jitter"],
+            praat_features["shimmer"],
+
+            # Librosa – fluency
+            librosa_features["pause_ratio"],
+            librosa_features["speech_rate"],
+        ]),
+        # Clarity / articulation
+        librosa_features["mfcc_mean"]
+    ])
+
+    return {
+        "audio_stats": audio_stats,     # full feature dictionary
+        "audio_vector": audio_vector   # ONLY essential features for fusion
+    }

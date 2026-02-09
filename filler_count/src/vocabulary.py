@@ -1,18 +1,15 @@
-import nltk
 from nltk.tokenize import word_tokenize
-
-nltk.download('punkt')
+import nltk
+nltk.download('punkt', quiet=True)
 
 def vocabulary_features(text):
-    print("🔹 Vocabulary Richness")
     words = [w.lower() for w in word_tokenize(text) if w.isalpha()]
     unique_words = set(words)
 
-    ttr = len(unique_words) / len(words) if words else 0
-    repetition_rate = 1 - ttr
+    lexical_diversity = len(unique_words) / max(len(words), 1)
+    repetition_rate = 1 - lexical_diversity
 
-    print("Total words:", len(words))
-    print("Unique words:", len(unique_words))
-    print("Type-Token Ratio:", round(ttr, 3))
-    print("Repetition Rate:", round(repetition_rate, 3))
-    print()
+    return {
+        "lexical_diversity": lexical_diversity,
+        "repetition_rate": repetition_rate
+    }

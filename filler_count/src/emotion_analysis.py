@@ -24,62 +24,22 @@ def split_sentences(text):
 
 
 # ---------------- MAIN PIPELINE ----------------
+
 def run_emotion_pipeline(transcript_json, output_dir):
     emotion_out = os.path.join(output_dir, "emotion_report.json")
-
-    # -------- LOAD TRANSCRIPT --------
     with open(transcript_json, "r", encoding="utf-8") as f:
         transcript = json.load(f)
+    text = transcript["full_text"]
 
-    raw_text = transcript["full_text"]
-    clean = clean_text(raw_text)
-    sentences = split_sentences(clean)
+    classifier = pipeline("text-classification", model=MODEL_NAME, top_k=None)
+    results = classifier(text[:512])[0]  # first 512 chars for simplicity
 
-    print(f"🧠 Analysing emotion from {len(sentences)} sentences")
+    # Take top 5 emotions
+    top_emotions = sorted(results, key=lambda x: x['score'], reverse=True)[:5]
+    emotion_vector = [e['score'] for e in top_emotions]
 
-    # -------- LOAD MODEL --------
-    classifier = pipeline(
-        "text-classification",
-        model=MODEL_NAME,
-        top_k=None
-    )
+    # Save JSON
+    with open(emotion_out, "w") as f:
+        json.dump({"emotions": top_emotions}, f, indent=4)
 
-    emotion_totals = {}
-    total_weight = 0
-
-    # -------- SENTENCE-LEVEL EMOTION --------
-    for sentence in sentences:
-        if len(sentence) > MAX_SENTENCE_CHARS:
-            continue
-
-        results = classifier(sentence)[0]
-        weight = len(sentence)
-        total_weight += weight
-
-        for r in results:
-            emotion_totals[r["label"]] = (
-                emotion_totals.get(r["label"], 0) + r["score"] * weight
-            )
-
-    # -------- NORMALIZE --------
-    final_emotions = [
-        {"label": k, "score": round(v / total_weight, 4)}
-        for k, v in emotion_totals.items()
-    ]
-    final_emotions.sort(key=lambda x: x["score"], reverse=True)
-
-    # -------- SAVE --------
-    with open(emotion_out, "w", encoding="utf-8") as f:
-        json.dump(
-            {
-                "text_length": len(raw_text),
-                "sentences_used": len(sentences),
-                "emotions": final_emotions
-            },
-            f,
-            indent=4
-        )
-
-    print("✅ Emotion analysis complete")
-    for e in final_emotions[:5]:
-        print(f"{e['label']}: {e['score']}")
+    return {"emotion_vector": emotion_vector}
