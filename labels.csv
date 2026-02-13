@@ -1,1 +1,20 @@
-video_id,youtube_url,confidence,clarity,fluency,engagement,nervousness
+v01,https://www.pexels.com/video/woman-in-dentist-waiting-room-6192962/,2,3,2,2,9
+v02,https://www.pexels.com/video/a-woman-sitting-and-holding-a-pregnancy-test-6150147/,3,4,2,3,8
+v03,https://www.pexels.com/video/a-woman-biting-her-finger-4588252/,3,2,2,3,9
+v04,https://www.pexels.com/video/a-woman-experiencing-a-panic-attack-8410575/,1,1,1,2,9
+v05,https://www.pexels.com/video/a-woman-with-a-headache-4588228/,2,2,3,2,8
+v06,https://www.pexels.com/video/a-woman-crying-and-wiping-her-tears-4588242/,3,2,2,3,9
+v07,https://www.pexels.com/video/worried-man-sitting-on-a-couch-5330444/,2,2,3,2,8
+v08, https://www.pexels.com/video/man-worried-about-credit-card-7534958/,2,2,3,2,9
+v09,https://www.pexels.com/video/a-man-looking-problematic-6986945/,3,2,2,3,8
+v10,https://www.pexels.com/video/shy-woman-looking-at-camera-8724414/,1,2,2,1,8
+v11,https://www.pexels.com/video/a-sad-woman-looking-at-the-camera-8066948/,2,2,3,2,9
+v12, https://www.pexels.com/video/a-woman-crying-while-wiping-her-tears-8724225/,1,2,2,3,8
+v13,https://www.pexels.com/video/nervous-man-walking-in-a-park-5544312/,2,2,1,1,9
+v14,https://www.pexels.com/video/young-woman-calling-for-help-7698902/,2,2,3,1,8
+v15,https://www.pexels.com/video/a-man-holding-his-head-6332726/,1,2,1,1,9
+v16,https://www.pexels.com/video/woman-crying-alone-5698820/,2,2,3,2,8
+v17,https://www.pexels.com/video/a-woman-with-a-headache-4587914/,1,1,2,1,8
+v18,https://www.pexels.com/video/a-woman-covering-herself-and-feeling-scared-6951597/,1,2,2,2,9
+v19,https://www.pexels.com/video/face-of-an-emotional-woman-8724511/,2,1,2,1,8
+v20,https://www.pexels.com/video/a-woman-is-not-feeling-well-in-the-classroom-6672383/,2,1,1,1,8
