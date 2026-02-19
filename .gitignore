@@ -62,8 +62,12 @@ src/models/*.task
 
 *.csv
 
-/frontend
-
 *.pth
 
 *.npy
+
+/temp
+
+/uploaded_videos
+
+uploads

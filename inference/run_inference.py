@@ -1,3 +1,4 @@
+# run_inference.py
 import numpy as np
 import torch
 import os
@@ -12,58 +13,75 @@ from sequence.segmenter import segment_video
 from main import run_video_pipeline
 from extract_audio_features import run_audio_pipeline
 from filler_count.src.main import run_text_pipeline
+from feedback.feedback_engine import generate_feedback
 
 
 DEVICE = "cpu"
-VIDEO_PATH = "data/videos/v18.mp4"
 
-# -------- Load models --------
-audio_dim =  len(run_audio_pipeline(VIDEO_PATH)["audio_vector"])
-video_dim =  len(run_video_pipeline(VIDEO_PATH)["video_vector"])
-text_dim  =  len(run_text_pipeline(VIDEO_PATH)["text_vector"])
+# -------- Load models ONCE (important for performance) --------
+amfn = None
+temporal = None
 
-amfn = AMFN(audio_dim, video_dim, text_dim).to(DEVICE)
-temporal = TemporalBiLSTM(input_dim=128).to(DEVICE)
+def load_models(video_path):
+    global amfn, temporal
 
-amfn.load_state_dict(torch.load("amfn_trained.pth", map_location=DEVICE))
-temporal.load_state_dict(torch.load("temporal_trained.pth", map_location=DEVICE))
+    if amfn is not None and temporal is not None:
+        return
 
-amfn.eval()
-temporal.eval()
+    audio_dim = len(run_audio_pipeline(video_path)["audio_vector"])
+    video_dim = len(run_video_pipeline(video_path)["video_vector"])
+    text_dim  = len(run_text_pipeline(video_path)["text_vector"])
 
-# -------- Segment video --------
-segments = segment_video(VIDEO_PATH, window_size=5)
+    amfn = AMFN(audio_dim, video_dim, text_dim).to(DEVICE)
+    temporal = TemporalBiLSTM(input_dim=128).to(DEVICE)
 
-# -------- Extract features once --------
-video_res = run_video_pipeline(VIDEO_PATH)
-audio_res = run_audio_pipeline(VIDEO_PATH)
-text_res  = run_text_pipeline(VIDEO_PATH)
+    amfn.load_state_dict(torch.load("amfn_trained.pth", map_location=DEVICE))
+    temporal.load_state_dict(torch.load("temporal_trained.pth", map_location=DEVICE))
 
-audio_vec = np.asarray(audio_res["audio_vector"], dtype=np.float32)
-video_vec = np.asarray(video_res["video_vector"], dtype=np.float32)
-text_vec  = np.asarray(text_res["text_vector"], dtype=np.float32)
+    amfn.eval()
+    temporal.eval()
 
-# -------- Build fusion sequence --------
-fusion_seq = []
 
-with torch.no_grad():
-    for _ in segments:
-        a = torch.tensor(audio_vec).unsqueeze(0)
-        v = torch.tensor(video_vec).unsqueeze(0)
-        t = torch.tensor(text_vec).unsqueeze(0)
+def run_inference(video_path: str):
+    load_models(video_path)
 
-        fusion = amfn(a, v, t)
-        fusion_seq.append(fusion)
+    segments = segment_video(video_path, window_size=5)
 
-    fusion_seq = torch.stack(fusion_seq, dim=1)  # (1, T, 128)
-    _, preds = temporal(fusion_seq)
-    preds = torch.sigmoid(preds) * 10.0
+    video_res = run_video_pipeline(video_path)
+    audio_res = run_audio_pipeline(video_path)
+    text_res  = run_text_pipeline(video_path)
 
-scores = np.rint(preds.squeeze().numpy()).astype(int)
-scores = np.clip(scores, 0, 10)
+    audio_vec = np.asarray(audio_res["audio_vector"], dtype=np.float32)
+    video_vec = np.asarray(video_res["video_vector"], dtype=np.float32)
+    text_vec  = np.asarray(text_res["text_vector"], dtype=np.float32)
 
-print("\n--- Predicted Public Speaking Scores ---")
-labels = ["Confidence", "Clarity", "Fluency", "Engagement", "Nervousness"]
-for l, s in zip(labels, scores):
-    print(f"{l}: {s}/10")
+    fusion_seq = []
+
+    with torch.no_grad():
+        for _ in segments:
+            a = torch.tensor(audio_vec).unsqueeze(0)
+            v = torch.tensor(video_vec).unsqueeze(0)
+            t = torch.tensor(text_vec).unsqueeze(0)
+
+            fusion = amfn(a, v, t)
+            fusion_seq.append(fusion)
+
+        fusion_seq = torch.stack(fusion_seq, dim=1)
+        _, preds = temporal(fusion_seq)
+        preds = torch.sigmoid(preds) * 10.0
+
+    scores = np.rint(preds.squeeze().numpy()).astype(int)
+    scores = np.clip(scores, 0, 10)
+
+    labels = ["Confidence", "Clarity", "Fluency", "Engagement", "Nervousness"]
+
+    results = dict(zip(labels, scores.tolist()))
+
+    feedback_data = generate_feedback(results)
+
+    return {
+        "scores": results,
+        "feedback": feedback_data["feedback"],
+        "suggestions": feedback_data["suggestions"]
+    }
 
