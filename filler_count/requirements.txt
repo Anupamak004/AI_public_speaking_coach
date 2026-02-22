@@ -10,4 +10,7 @@ textstat
 language-tool-python
 webrtcvad-wheels
 language-tool-python
+passlib[bcrypt] 
+python-jose 
+python-multipart
 

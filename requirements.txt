@@ -9,3 +9,9 @@ scipy>=1.15.0
 tf-keras
 protobuf==5.29.0  # Critical: Fixes conflict between TensorFlow and MediaPipe
 tensorflow>=2.16.0
+passlib==1.7.4
+psycopg2-binary==2.9.11
+pydantic==2.12.5
+python-dotenv==1.2.1
+python-jose==3.5.0
+SQLAlchemy==2.0.46
