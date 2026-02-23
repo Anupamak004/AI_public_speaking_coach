@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/app.css";
 
+
 const Register = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -9,8 +10,6 @@ const Register = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    coachingGoal: "",
-    experience: "",
     agreeTerms: false
   });
 
@@ -24,13 +23,9 @@ const Register = () => {
       ...prev,
       [name]: type === "checkbox" ? checked : value
     }));
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ""
-      }));
-    }
+    setErrors(prev => ({ ...prev, [name]: "" }));
   };
+
 
   const validateForm = () => {
     const newErrors = {};
@@ -55,14 +50,6 @@ const Register = () => {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
-    if (!formData.coachingGoal) {
-      newErrors.coachingGoal = "Please select a coaching goal";
-    }
-
-    if (!formData.experience) {
-      newErrors.experience = "Please select your experience level";
-    }
-
     if (!formData.agreeTerms) {
       newErrors.agreeTerms = "You must agree to the terms and conditions";
     }
@@ -72,31 +59,34 @@ const Register = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
+  console.log("SUBMIT CLICKED", formData);
+  if (!validateForm()) return;
 
-    if (!validateForm()) {
-      return;
-    }
+  setIsLoading(true);
 
-    setIsLoading(true);
+  try {
+    const res = await fetch("http://127.0.0.1:8000/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password
+      })
+    });
 
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail);
 
-      console.log("Registration data:", formData);
-      setSuccessMessage("Registration successful! Welcome to your AI Speaking Coach journey.");
-      
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 2000);
-    } catch (error) {
-      console.error("Registration error:", error);
-      setErrors({ submit: "Registration failed. Please try again." });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    setSuccessMessage("Registration successful!");
+    setTimeout(() => navigate("/dashboard"), 1500);
+  } catch (err) {
+    setErrors({ submit: err.message });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleBackHome = () => {
     navigate("/");
@@ -252,34 +242,33 @@ const Register = () => {
                 )}
 
                 {/* Submit Button */}
-                <button
-                  type="submit"
-                  className="submit-button"
-                  disabled={isLoading || successMessage}
-                >
-                  {isLoading ? (
-                    <>
-                      <span className="spinner"></span>
-                      Creating Your Account...
-                    </>
-                  ) : successMessage ? (
-                    <>
-                      <span className="checkmark">✓</span>
-                      Registration Successful
-                    </>
-                  ) : (
-                    "Create My Account"
-                  )}
-                </button>
+
+                  <button
+                    type="submit"
+                    className="submit-button"
+                    disabled={isLoading || successMessage}
+                  >
+                    {isLoading ? "Creating Account..." : "Create My Account"}
+                  </button>
 
                 {/* Login Link */}
                 <div className="form-footer">
-                  <p>Already have an account? <button 
-                    onClick={() => navigate("/")}
-                    style={{ background: "none", border: "none", color: "#4f46e5", cursor: "pointer", textDecoration: "underline", fontWeight: "600" }}
-                  >
-                    Sign in here
-                  </button></p>
+                  <p>Already have an account? <button
+                      onClick={() =>
+                        navigate("/", { state: { scrollTo: "login-section" } })
+                      }
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "#4f46e5",
+                        cursor: "pointer",
+                        textDecoration: "underline",
+                        fontWeight: "600"
+                      }}
+                    >
+                      Sign in here
+                    </button>
+                    </p>
                 </div>
               </form>
             </div>
