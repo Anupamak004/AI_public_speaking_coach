@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 
 const speakerProgressData = {
@@ -237,6 +238,7 @@ const ScoreCircle = ({ score, metric }) => {
 };
 
 const SpeakerProgress = () => {
+  const navigate = useNavigate();
   const maxScore = Math.max(...speakerProgressData.scoresTrend.map(s => s.score));
   const minScore = Math.min(...speakerProgressData.scoresTrend.map(s => s.score));
   const scoreRange = maxScore - minScore;
@@ -245,6 +247,7 @@ const SpeakerProgress = () => {
     <div className="speaker-progress-page">
       {/* Header Section */}
       <div className="progress-header">
+        <button className="back-to-dashboard" onClick={() => navigate("/dashboard")}>← Back to Dashboard</button>
         <div className="progress-header-content">
           <h1>Speaker Progress Dashboard</h1>
           <p className="header-subtitle">

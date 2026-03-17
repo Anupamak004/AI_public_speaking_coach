@@ -15,22 +15,19 @@ from extract_audio_features import run_audio_pipeline
 from filler_count.src.main import run_text_pipeline
 from feedback.feedback_engine import generate_feedback
 
-
 DEVICE = "cpu"
 
-# -------- Load models ONCE (important for performance) --------
+# -------- Global cached models --------
 amfn = None
 temporal = None
 
-def load_models(video_path):
+
+# -------- Load models ONCE --------
+def load_models(audio_dim, video_dim, text_dim):
     global amfn, temporal
 
     if amfn is not None and temporal is not None:
         return
-
-    audio_dim = len(run_audio_pipeline(video_path)["audio_vector"])
-    video_dim = len(run_video_pipeline(video_path)["video_vector"])
-    text_dim  = len(run_text_pipeline(video_path)["text_vector"])
 
     amfn = AMFN(audio_dim, video_dim, text_dim).to(DEVICE)
     temporal = TemporalBiLSTM(input_dim=128).to(DEVICE)
@@ -42,11 +39,10 @@ def load_models(video_path):
     temporal.eval()
 
 
+# -------- Main inference --------
 def run_inference(video_path: str):
-    load_models(video_path)
 
-    segments = segment_video(video_path, window_size=5)
-
+    # -------- Run pipelines ONCE --------
     video_res = run_video_pipeline(video_path)
     audio_res = run_audio_pipeline(video_path)
     text_res  = run_text_pipeline(video_path)
@@ -55,33 +51,46 @@ def run_inference(video_path: str):
     video_vec = np.asarray(video_res["video_vector"], dtype=np.float32)
     text_vec  = np.asarray(text_res["text_vector"], dtype=np.float32)
 
-    fusion_seq = []
+    # -------- Load models using extracted dimensions --------
+    load_models(
+        audio_dim=len(audio_vec),
+        video_dim=len(video_vec),
+        text_dim=len(text_vec)
+    )
+
+    # -------- Temporal segmentation (kept for same behavior) --------
+    segments = segment_video(video_path, window_size=5)
+    seq_len = len(segments)
 
     with torch.no_grad():
-        for _ in segments:
-            a = torch.tensor(audio_vec).unsqueeze(0)
-            v = torch.tensor(video_vec).unsqueeze(0)
-            t = torch.tensor(text_vec).unsqueeze(0)
+        a = torch.tensor(audio_vec).unsqueeze(0)
+        v = torch.tensor(video_vec).unsqueeze(0)
+        t = torch.tensor(text_vec).unsqueeze(0)
 
-            fusion = amfn(a, v, t)
-            fusion_seq.append(fusion)
+        # -------- Fusion ONCE --------
+        fusion = amfn(a, v, t)  # (1, 128)
 
-        fusion_seq = torch.stack(fusion_seq, dim=1)
+        # -------- Repeat only for temporal input shape --------
+        fusion_seq = fusion.unsqueeze(1).repeat(1, seq_len, 1)
+
         _, preds = temporal(fusion_seq)
         preds = torch.sigmoid(preds) * 10.0
 
-    scores = np.rint(preds.squeeze().numpy()).astype(int)
+    # -------- Post-processing (unchanged) --------
+    scores = np.rint(preds.squeeze().cpu().numpy()).astype(int)
     scores = np.clip(scores, 0, 10)
 
     labels = ["Confidence", "Clarity", "Fluency", "Engagement", "Nervousness"]
-
     results = dict(zip(labels, scores.tolist()))
 
-    feedback_data = generate_feedback(results)
-
-    return {
-        "scores": results,
-        "feedback": feedback_data["feedback"],
-        "suggestions": feedback_data["suggestions"]
+    feature_context = {
+        "audio": audio_res,
+        "video": video_res,
+        "text": text_res
     }
 
+    feedback_data = generate_feedback(results)
+    return {
+        "scores": results,
+        **feedback_data
+    }

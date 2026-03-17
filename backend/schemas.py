@@ -9,3 +9,19 @@ class RegisterSchema(BaseModel):
 class LoginSchema(BaseModel):
     email: EmailStr
     password: str
+
+
+# 👇 NEW
+class ProfileResponse(BaseModel):
+    fullName: str
+    email: EmailStr
+
+
+class ProfileUpdateSchema(BaseModel):
+    fullName: str
+    email: EmailStr
+
+
+class ChangePasswordSchema(BaseModel):
+    currentPassword: str
+    newPassword: str    

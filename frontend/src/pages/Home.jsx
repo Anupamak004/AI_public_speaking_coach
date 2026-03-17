@@ -23,13 +23,20 @@ const Home = () => {
     const res = await fetch("http://127.0.0.1:8000/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password }),
     });
 
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail);
 
+    // ✅ Store logged-in user
+    localStorage.setItem(
+      "user",
+      JSON.stringify({ id: data.user_id })
+    );
+
     navigate("/dashboard");
+
   } catch (err) {
     alert(err.message);
   }
