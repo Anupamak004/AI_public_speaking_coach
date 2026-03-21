@@ -1,8 +1,9 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException, Depends
 import shutil
 import os
 from fastapi.middleware.cors import CORSMiddleware
 from inference.run_inference import run_inference
+from sqlalchemy.orm import Session
 from db_connection.database import engine, SessionLocal
 from db_connection import db_model
 from db_connection import schemas
@@ -69,7 +70,7 @@ def login(user: schemas.UserCreate, db: Session = Depends(get_db)):
         db.refresh(new_user)
         db_user = new_user 
 
-    if not db_user or not verify_password(user.password, db_user.password):
+    elif not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=400, detail="Invalid credentials")
 
     access_token = create_access_token(data={"sub": db_user.username})
