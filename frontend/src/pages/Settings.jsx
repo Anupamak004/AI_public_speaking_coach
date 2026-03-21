@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
+import { useEffect } from "react";
 
 export default function Settings() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("profile");
   const [formData, setFormData] = useState({
-    fullName: "John Doe",
-    email: "john@example.com",
+    fullName: "",
+    email: "",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
@@ -28,6 +29,33 @@ export default function Settings() {
 
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
+  const getInitials = (name) => {
+  if (!name) return "?";
+  const parts = name.trim().split(" ");
+  if (parts.length === 1) return parts[0][0].toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+ };
+
+  useEffect(() => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userId = user?.id;
+
+  if (!userId) return;
+
+  fetch(`http://localhost:8000/user/profile?user_id=${userId}`)
+    .then((res) => res.json())
+    .then((data) => {
+      setFormData((prev) => ({
+        ...prev,
+        fullName: data.fullName,
+        email: data.email,
+      }));
+    })
+    .catch(() => {
+      setMessage("Failed to load profile");
+      setMessageType("warning");
+    });
+}, []);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -69,6 +97,57 @@ export default function Settings() {
       setMessageType("warning");
     }
   };
+
+  const handleSaveProfile = async () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userId = user?.id;
+
+  if (!userId) return;
+
+  const res = await fetch(
+    `http://localhost:8000/user/profile?user_id=${userId}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fullName: formData.fullName,
+        email: formData.email,
+      }),
+    }
+  );
+
+  const data = await res.json();
+  setMessage(data.message);
+  setMessageType("success");
+  setTimeout(() => setMessage(""), 3000);
+};
+
+const handleChangePassword = async () => {
+  if (formData.newPassword !== formData.confirmPassword) {
+    setMessage("Passwords do not match");
+    setMessageType("warning");
+    return;
+  }
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userId = user?.id;
+
+  const res = await fetch(
+    `http://localhost:8000/user/change-password?user_id=${userId}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword,
+      }),
+    }
+  );
+
+  const data = await res.json();
+  setMessage(data.message);
+  setMessageType("success");
+};
 
   return (
     <div className="settings-page">
@@ -125,7 +204,9 @@ export default function Settings() {
                   {formData.profileImage ? (
                     <img src={formData.profileImage} alt="Profile" />
                   ) : (
-                    <div className="profile-placeholder">JD</div>
+                    <div className="profile-placeholder">
+                        {getInitials(formData.fullName)}
+                      </div>
                   )}
                 </div>
                 <label className="profile-upload-btn">
@@ -163,10 +244,7 @@ export default function Settings() {
                   />
                 </div>
 
-                <button
-                  className="settings-save-btn primary"
-                  onClick={() => handleSave("Profile")}
-                >
+                <button className="settings-save-btn primary" onClick={handleSaveProfile}>
                   Save Profile
                 </button>
               </div>
@@ -215,10 +293,7 @@ export default function Settings() {
                   />
                 </div>
 
-                <button
-                  className="settings-save-btn primary"
-                  onClick={() => handleSave("Password")}
-                >
+                <button className="settings-save-btn primary" onClick={handleChangePassword}>
                   Update Password
                 </button>
               </div>

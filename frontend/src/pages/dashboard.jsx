@@ -17,8 +17,11 @@ export default function Dashboard() {
   setAnalyzed(false);
 
   try {
-    const formData = new FormData();
-    formData.append("file", videoFile);
+    const user = JSON.parse(localStorage.getItem("user"));
+
+const formData = new FormData();
+formData.append("file", videoFile);
+formData.append("user_id", user.id); // send user id
 
     const response = await fetch("http://localhost:8000/analyze", {
       method: "POST",
@@ -46,6 +49,7 @@ export default function Dashboard() {
     setSuggestions(data.scores.suggestions || []);
     setAnalyzed(true);
 
+
   } catch (err) {
     console.error("Analysis failed:", err);
     alert("Failed to analyze video");
@@ -67,6 +71,27 @@ export default function Dashboard() {
             <li style={{ padding: "16px 32px", cursor: "pointer" }} onClick={() => window.location.href = "/settings"}>Settings</li>
           </ul>
         </nav>
+        <button
+          onClick={() => {
+            localStorage.removeItem("user");
+            window.location.href = "/";
+          }}
+          style={{
+            margin: "0 16px 24px 16px",
+            padding: "12px 20px",
+            background: "#dc2626",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            fontWeight: 600,
+            cursor: "pointer",
+            transition: "background 0.3s ease",
+          }}
+          onMouseEnter={(e) => e.target.style.background = "#b91c1c"}
+          onMouseLeave={(e) => e.target.style.background = "#dc2626"}
+        >
+          Logout
+        </button>
         <div style={{ textAlign: "center", marginTop: "auto", fontSize: "0.95rem", opacity: 0.7 }}>© 2026 AI Speaking Coach</div>
       </aside>
 
@@ -94,6 +119,27 @@ export default function Dashboard() {
           </p>
         </div>
 
+        {/* HOME BUTTON */}
+<button
+  onClick={() => (window.location.href = "/")}
+  style={{
+    position: "absolute",
+    top: "24px",
+    right: "32px",
+    background: "#4f46e5",
+    color: "white",
+    padding: "10px 18px",
+    borderRadius: "10px",
+    fontWeight: 600,
+    border: "none",
+    cursor: "pointer",
+    boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
+    zIndex: 1000,
+  }}
+>
+   Home
+</button>
+
         {/* UPLOAD */}
         <div className="upload-preview-card">
           <h3>Upload Presentation</h3>
@@ -102,16 +148,18 @@ export default function Dashboard() {
             {video ? (
               <>
                 <video src={video} controls className="video-preview" />
-                <button
-                  className="replace-btn"
-                  onClick={() => {
-                    setVideo(null);
-                    setVideoFile(null);
-                    setAnalyzed(false);
-                  }}
-                >
-                  Replace
-                </button>
+                {!loading && !analyzed && (
+                  <button
+                    className="replace-btn"
+                    onClick={() => {
+                      setVideo(null);
+                      setVideoFile(null);
+                      setAnalyzed(false);
+                    }}
+                  >
+                    Replace
+                  </button>
+                )}
               </>
             ) : (
               <label className="upload-label">
@@ -126,7 +174,7 @@ export default function Dashboard() {
                     setVideoFile(file);
                   }}
                 />
-                <span className="upload-icon">🎥</span>
+                <span className="upload-icon"></span>
                 <p className="muted-text">Click or drag video here</p>
               </label>
             )}

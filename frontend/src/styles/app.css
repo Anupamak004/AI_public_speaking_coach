@@ -431,11 +431,13 @@ body {
 /*------------- LOGIN SECTION ------------ */
 
 .login-section {
-    min-height: 100vh;
+    /* allow content to determine height rather than fixing it */
+    min-height: 600px;
     display: flex;
     align-items: center;
     background: linear-gradient(135deg, #667eea, #764ba2);
     padding: 4rem 2rem;
+    flex-direction: column;
 }
 
 .login-container {
@@ -587,12 +589,65 @@ body {
     .footer-container {
         grid-template-columns: 1fr;
     }
+
+    .login-section {
+        padding: 1.5rem 1rem;
+    }
+
+    .intro-box h1 {
+        font-size: 1.8rem;
+    }
 }
 
 @media (max-width: 768px) {
+    .nav-links {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 1rem;
+        background: rgba(255,255,255,0.95);
+        padding: 1rem 0;
+    }
+
+    .nav-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero-features {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .login-section {
+        padding: 2rem 1rem;
+        min-height: auto;
+    }
+
     .login-container {
         grid-template-columns: 1fr;
+        gap: 2rem;
         text-align: center;
+    }
+
+    .login-left,
+    .login-right {
+        width: 100%;
+    }
+
+    .login-form {
+        padding: 2rem;
+        max-width: 100%;
+        box-shadow: none;
     }
 
     .intro-box {
@@ -605,29 +660,7 @@ body {
 }
 
 
-/* ---------- LEFT SECTION ---------- */
-.intro-box {
-    padding: 6rem 4rem;
-    color: white;
-}
-
-.intro-box h1 {
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-}
-
-.intro-box p {
-    font-size: 1.1rem;
-    opacity: 0.95;
-    line-height: 1.7;
-    margin-bottom: 2rem;
-}
-
-.intro-list {
-    font-size: 1rem;
-    line-height: 2;
-}
+/* duplicate login left section removed - styles consolidated above */
 
 /* ========== REGISTER PAGE STYLES ========== */
 

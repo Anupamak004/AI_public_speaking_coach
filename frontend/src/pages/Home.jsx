@@ -1,9 +1,14 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { useEffect } from "react";
 import "../styles/app.css";
 
 const Home = () => {
   const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const scrollToLogin = () => {
     const el = document.getElementById("login-section");
@@ -11,10 +16,48 @@ const Home = () => {
       el.scrollIntoView({ behavior: "smooth" });
     }
   };
-  const handleLogin = (e) => {
-    e.preventDefault(); // prevent page refresh
-    navigate("/dashboard"); // redirect after login
-  };
+  const handleLogin = async (e) => {
+  e.preventDefault();
+
+  try {
+    const res = await fetch("http://127.0.0.1:8000/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail);
+
+    // ✅ Store logged-in user
+    localStorage.setItem(
+      "user",
+      JSON.stringify({ id: data.user_id })
+    );
+
+    navigate("/dashboard");
+
+  } catch (err) {
+    alert(err.message);
+  }
+};
+
+  const location = useLocation();
+
+useEffect(() => {
+  if (location.state?.scrollTo) {
+    const el = document.getElementById(location.state.scrollTo);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+
+    // ✅ CLEAR state so refresh doesn't scroll again
+    navigate(location.pathname, { replace: true, state: {} });
+  }
+}, [location, navigate]);
+
+
+
 
   return (
     <>
@@ -44,9 +87,9 @@ const Home = () => {
           </div>
 
           <div className="hero-features">
-            <div className="feature-item">🎯 AI Analysis</div>
-            <div className="feature-item">📊 Real-time Feedback</div>
-            <div className="feature-item">📈 Progress Tracking</div>
+            <div className="feature-item"> AI Analysis</div>
+            <div className="feature-item"> Real-time Feedback</div>
+            <div className="feature-item"> Progress Tracking</div>
           </div>
 
           <div className="hero-buttons">
@@ -248,7 +291,7 @@ const Home = () => {
           <div className="login-left">
             <div className="intro-box">
               <h1>
-                🎤 Speak Confidently.<br />
+                 Speak Confidently.<br />
                 Speak Smarter.
               </h1>
 
@@ -276,18 +319,22 @@ const Home = () => {
               </p>
 
               <input
-                type="email"
-                placeholder="Email Address"
-                className="input-field"
-                required
-              />
+              type="email"
+              placeholder="Email Address"
+              className="input-field"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
 
-              <input
-                type="password"
-                placeholder="Password"
-                className="input-field"
-                required
-              />
+            <input
+              type="password"
+              placeholder="Password"
+              className="input-field"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
 
               <button type="submit" className="btn-primary full-width">
                 Login

@@ -71,3 +71,5 @@ src/models/*.task
 /uploaded_videos
 
 uploads
+
+*.env
