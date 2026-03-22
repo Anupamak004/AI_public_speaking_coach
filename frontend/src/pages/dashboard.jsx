@@ -58,6 +58,16 @@ formData.append("user_id", user.id); // send user id
   }
 };
 
+  // ✅ EXTRACT CONFIDENCE AS MAIN SCORE
+  const confidenceScore = scores.find(
+    (item) => item.label.toLowerCase() === "confidence"
+  );
+
+  // ✅ REMOVE CONFIDENCE FROM SUB METRICS
+  const otherScores = scores.filter(
+    (item) => item.label.toLowerCase() !== "confidence"
+  );
+
   return (
     <div className="dashboard" style={{ display: "flex", minHeight: "100vh" }}>
       {/* SIDEBAR */}
@@ -205,91 +215,94 @@ formData.append("user_id", user.id); // send user id
               ✅ Analysis completed successfully
             </div>
 
-            <h2
-              style={{
-                fontSize: "1.4rem",
-                fontWeight: 700,
-                marginBottom: "18px",
-              }}
-            >
-              Performance Overview
-            </h2>
-
-            {/* SCORES GRID */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-                gap: "20px",
-              }}
-            >
-              {scores.map((item) => (
-                <div
-                  key={item.label}
-                  style={{
-                    background: "white",
-                    padding: "20px",
-                    borderRadius: "12px",
-                    textAlign: "center",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: "28px",
-                      fontWeight: 700,
-                      color: "#4f46e5",
-                    }}
-                  >
-                    {item.value}/10
+            {/* ✅ MAIN CONFIDENCE SCORE */}
+            {confidenceScore && (
+              <div className="overall-score-section">
+                <h2>Overall Confidence Score</h2>
+                <div className="circular-progress-container">
+                  <svg className="circular-progress" viewBox="0 0 200 200">
+                    {/* Background circle */}
+                    <circle
+                      cx="100"
+                      cy="100"
+                      r="90"
+                      fill="none"
+                      stroke="rgba(255, 255, 255, 0.2)"
+                      strokeWidth="12"
+                    />
+                    {/* Progress circle */}
+                    <circle
+                      cx="100"
+                      cy="100"
+                      r="90"
+                      fill="none"
+                      stroke="url(#progressGradient)"
+                      strokeWidth="12"
+                      strokeDasharray={`${(confidenceScore.value / 10) * 565.5} 565.5`}
+                      strokeLinecap="round"
+                      className="progress-ring"
+                    />
+                    <defs>
+                      <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#fbbf24" />
+                        <stop offset="100%" stopColor="#f59e0b" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <div className="score-display">
+                    <div className="score-number">{confidenceScore.value}</div>
+                    <div className="score-max">/10</div>
                   </div>
-
-                  <div style={{ marginTop: "6px", fontWeight: 600 }}>
-                    {item.label}
-                  </div>
-
-                  {feedback[item.label] && (
-                    <p
-                      style={{
-                        marginTop: "10px",
-                        fontSize: "0.9rem",
-                        color: "#6b7280",
-                      }}
-                    >
-                      {feedback[item.label]}
-                    </p>
-                  )}
                 </div>
-              ))}
-            </div>
+                {feedback["Confidence"] && (
+                  <p className="overall-score-feedback">
+                    {feedback["Confidence"]}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* SUB SCORES */}
+            {otherScores.length > 0 && (
+              <div className="performance-breakdown">
+                <h2 className="breakdown-header">
+                  Performance Breakdown
+                </h2>
+
+                <div className="score-cards-grid">
+                  {otherScores.map((item) => (
+                    <div key={item.label} className="score-card">
+                      <div className="score-card-number">
+                        {item.value}
+                        <span>/10</span>
+                      </div>
+
+                      <div className="score-card-label">
+                        {item.label}
+                      </div>
+
+                      {feedback[item.label] && (
+                        <p className="score-card-feedback">
+                          {feedback[item.label]}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* SUGGESTIONS */}
             {suggestions.length > 0 && (
-              <section style={{ marginTop: "40px" }}>
-                <h2
-                  style={{
-                    fontSize: "1.4rem",
-                    fontWeight: 700,
-                    marginBottom: "16px",
-                  }}
-                >
+              <section className="suggestions-section">
+                <h2 className="suggestions-header">
                   Personalized Coaching Tips
                 </h2>
 
-                <div
-                  style={{
-                    background: "white",
-                    padding: "20px",
-                    borderRadius: "12px",
-                  }}
-                >
-                  <ul
-                    style={{
-                      paddingLeft: "20px",
-                      color: "#374151",
-                    }}
-                  >
+                <div className="suggestions-container">
+                  <ul className="suggestions-list">
                     {suggestions.map((tip, idx) => (
-                      <li key={idx} style={{ marginBottom: "10px" }}>
+                      <li key={idx}>
                         {tip}
                       </li>
                     ))}

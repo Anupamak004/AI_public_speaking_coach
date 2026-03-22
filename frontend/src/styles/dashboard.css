@@ -1098,6 +1098,329 @@ video {
     line-height: 1;
 }
 
+/* =======================================
+   PROFESSIONAL OVERALL SCORE SECTION
+   ======================================= */
+.overall-score-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 32px 24px;
+    border-radius: 20px;
+    text-align: center;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+    width: 500px;
+    margin-left: 340px;
+}
+
+.overall-score-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    filter: blur(40px);
+}
+
+.overall-score-section::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    filter: blur(40px);
+}
+
+.overall-score-section h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 2;
+}
+
+.circular-progress-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 20px auto;
+    z-index: 2;
+}
+
+.circular-progress {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+}
+
+.progress-ring {
+    transition: stroke-dasharray 0.8s ease;
+}
+
+.score-display {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 3;
+}
+
+.score-number {
+    font-size: 36px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -2px;
+}
+
+.score-number-large{
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.score-max {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.overall-score-feedback {
+    margin-top: 12px;
+    opacity: 0.92;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    position: relative;
+    z-index: 2;
+}
+
+/* =======================================
+   PERFORMANCE BREAKDOWN  
+   ======================================= */
+.performance-breakdown {
+    margin-top: 48px;
+}
+
+.breakdown-header {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 28px;
+    color: #1a365d;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.breakdown-header::before {
+    content: '';
+    width: 4px;
+    height: 28px;
+    background: linear-gradient(180deg, #4f46e5, #667eea);
+    border-radius: 2px;
+}
+
+.score-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 22px;
+    margin-bottom: 40px;
+}
+
+.score-card {
+    background: white;
+    padding: 28px 24px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.score-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4f46e5, #667eea);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+    transform-origin: left;
+}
+
+.score-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(79, 70, 229, 0.15);
+    border-color: rgba(79, 70, 229, 0.2);
+}
+
+.score-card:hover::before {
+    transform: scaleX(1);
+}
+
+.score-card-number {
+    font-size: 34px;
+    font-weight: 800;
+    color: #4f46e5;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 4px;
+}
+
+.score-card-label {
+    font-weight: 700;
+    color: #1a365d;
+    font-size: 1.05rem;
+    margin-bottom: 14px;
+}
+
+.score-card-feedback {
+    font-size: 0.92rem;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+/* =======================================
+   SUGGESTIONS SECTION
+   ======================================= */
+.suggestions-section {
+    margin-top: 48px;
+}
+
+.suggestions-header {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 28px;
+    color: #1a365d;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.suggestions-header::before {
+    content: '';
+    width: 4px;
+    height: 28px;
+    background: linear-gradient(180deg, #10b981, #14b8a6);
+    border-radius: 2px;
+}
+
+.suggestions-container {
+    background: white;
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.suggestions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.suggestions-list li {
+    padding: 16px 0;
+    padding-left: 32px;
+    color: #374151;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    border-bottom: 1px solid #f3f4f6;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.suggestions-list li:last-child {
+    border-bottom: none;
+}
+
+.suggestions-list li:hover {
+    color: #1a365d;
+    padding-left: 36px;
+}
+
+.suggestions-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, #10b981, #14b8a6);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+/* =======================================
+   RESPONSIVE DESIGN
+   ======================================= */
+@media (max-width: 768px) {
+    .overall-score-section {
+        padding: 24px 16px;
+    }
+
+    .circular-progress-container {
+        width: 130px;
+        height: 130px;
+        margin: 16px auto;
+    }
+
+    .score-number {
+        font-size: 30px;
+    }
+
+    .overall-score-section h2 {
+        font-size: 1.1rem;
+    }
+
+    .score-cards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 16px;
+    }
+
+    .score-card {
+        padding: 20px 16px;
+    }
+
+    .score-card-number {
+        font-size: 32px;
+    }
+
+    .breakdown-header,
+    .suggestions-header {
+        font-size: 1.3rem;
+    }
+
+    .suggestions-container {
+        padding: 24px;
+    }
+
+    .suggestions-list li {
+        font-size: 0.95rem;
+        padding: 12px 0;
+        padding-left: 28px;
+    }
+}
+
 .large-score-max {
     font-size: 1rem;
     opacity: 0.9;
@@ -1849,18 +2172,21 @@ video {
     background: linear-gradient(135deg, rgba(5, 150, 105, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%);
     color: #059669;
     border: 1px solid rgba(5, 150, 105, 0.2);
+    font-size: xx-large;
 }
 
 .score-badge.very-good {
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
     color: #3b82f6;
     border: 1px solid rgba(59, 130, 246, 0.2);
+    font-size: xx-large;
 }
 
 .score-badge.good {
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
     color: #f59e0b;
     border: 1px solid rgba(245, 158, 11, 0.2);
+    font-size: xx-large;
 }
 
 .score-label {
@@ -2606,5 +2932,264 @@ input[type="checkbox"]:checked+.slider:before {
         width: 120px;
         height: 120px;
         font-size: 2.5rem;
+    }
+}
+
+/* =======================================
+   SESSION HISTORY MODAL SCORE SECTION
+   ======================================= */
+.overall-score-detail {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 32px 28px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.2);
+}
+
+.overall-score-detail::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -8%;
+    width: 250px;
+    height: 250px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    filter: blur(40px);
+}
+
+.overall-score-detail::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 150px;
+    height: 150px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    filter: blur(40px);
+}
+
+.overall-score-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    position: relative;
+    z-index: 2;
+    align-items: center;
+}
+
+.score-display-left {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.score-number {
+    font-size: 48px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -15px;
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.score-max {
+    font-size: 1.7rem;
+    opacity: 0.85;
+    font-weight: 600;
+    margin-top: 8px;
+}
+
+.score-performance-level {
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    width: fit-content;
+    backdrop-filter: blur(10px);
+}
+
+.score-performance-level-detail {
+    font-size: 25px;
+}
+
+.performance-badges-detail {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.badge-detail {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+}
+
+.badge-detail.excellent {
+    background: rgba(5, 150, 105, 0.25);
+    color: #d1fae5;
+    border: 1px solid rgba(5, 150, 105, 0.3);
+}
+
+.badge-detail.good {
+    background: rgba(59, 130, 246, 0.25);
+    color: #dbeafe;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.badge-detail.fair {
+    background: rgba(251, 146, 60, 0.25);
+    color: #fed7aa;
+    border: 1px solid rgba(251, 146, 60, 0.3);
+}
+
+.badge-detail.poor {
+    background: rgba(239, 68, 68, 0.25);
+    color: #fecaca;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.score-gauge-bar-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.gauge-track-detail {
+    width: 100%;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 14px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.gauge-fill-detail {
+    height: 100%;
+    background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+    border-radius: 14px;
+    transition: width 1s cubic-bezier(0.4, 0.0, 0.2, 1);
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+}
+
+.gauge-scale-detail {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 2px;
+}
+
+.gauge-label-detail {
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: 0.9;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.score-description-detail {
+    font-size: 0.9rem;
+    opacity: 0.95;
+    line-height: 1.4;
+    margin-top: 4px;
+}
+
+/* Responsive Design for Modal */
+@media (max-width: 1200px) {
+    .overall-score-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .score-gauge-bar-detail {
+        width: 100%;
+    }
+
+    .overall-score-detail {
+        padding: 24px 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .overall-score-detail {
+        padding: 20px 16px;
+        margin-bottom: 20px;
+    }
+
+    .overall-score-container {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .score-number {
+        font-size: 40px;
+    }
+
+    .gauge-track-detail {
+        height: 24px;
+    }
+
+    .gauge-label-detail {
+        font-size: 0.7rem;
+    }
+
+    .score-performance-level {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+    }
+
+    .performance-badges-detail {
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .badge-detail {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .overall-score-detail {
+        padding: 16px 12px;
+    }
+
+    .overall-score-container {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .score-number {
+        font-size: 32px;
+    }
+
+    .gauge-track-detail {
+        height: 20px;
+    }
+
+    .score-description-detail {
+        font-size: 0.85rem;
+    }
+
+    .performance-badges-detail {
+        gap: 6px;
+    }
+
+    .badge-detail {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+        gap: 4px;
     }
 }

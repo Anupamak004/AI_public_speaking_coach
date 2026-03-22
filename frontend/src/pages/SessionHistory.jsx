@@ -2,14 +2,27 @@ import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 
-const SessionDetailModal = ({ session, onClose }) => {
+const SessionDetailModal = ({ session, sessionIndex, onClose }) => {
   if (!session) return null;
+
+  // Get confidence score from metrics or use overall score
+  const confidenceScore = session.metrics?.Confidence || session.score;
+  
+  // Function to get performance level
+  const getPerformanceLevel = (score) => {
+    if (score >= 8) return { level: "Excellent", class: "excellent" };
+    if (score >= 6) return { level: "Good", class: "good" };
+    if (score >= 4) return { level: "Fair", class: "fair" };
+    return { level: "Needs Improvement", class: "poor" };
+  };
+
+  const performance = getPerformanceLevel(confidenceScore);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="session-detail-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>{session.title}</h2>
+          <h2>Session {sessionIndex}</h2>
           <button className="close-button" onClick={onClose}>✕</button>
         </div>
 
@@ -38,27 +51,50 @@ const SessionDetailModal = ({ session, onClose }) => {
                 <label>Duration</label>
                 <span>{session.duration}</span>
               </div>
-              <div className="detail-item">
-                <label>Type</label>
-                <span>{session.type}</span>
-              </div>
-              <div className="detail-item">
-                <label>Status</label>
-                <span className="status-badge">{session.status}</span>
-              </div>
             </div>
           </div>
 
           {/* Overall Score */}
-          <div className="detail-section">
-            <h3>Overall Performance Score</h3>
-            <div className="score-display">
-              <div className={`large-score-circle ${session.score >= 8.5 ? 'excellent' : session.score >= 8 ? 'very-good' : 'good'}`}>
-                <span className="large-score">{session.score.toFixed(1)}</span>
-                <span className="large-score-max">/10</span>
+          <div className="detail-section overall-score-detail">
+            <h3>Overall Confidence Score</h3>
+            <div className="overall-score-container">
+              {/* Left Side: Score Display */}
+              <div className="score-display-left">
+                <div className="score-number-large">
+                  {Math.round(confidenceScore)}
+                  <span className="score-max-large">/10</span>
+                </div>
+                <div className={`score-performance-level-detail ${performance.class}`}>
+                  {performance.level}
+                </div>
               </div>
-              <div className="score-description">
-                <p>Your performance in this session was <strong>{session.score >= 8.5 ? 'outstanding' : session.score >= 8 ? 'very good' : 'good'}</strong>.</p>
+
+              {/* Right Side: Gauge Bar */}
+              <div className="score-gauge-bar-detail">
+                <div className="gauge-track-detail">
+                  <div
+                    className="gauge-fill-detail"
+                    style={{
+                      width: `${(confidenceScore / 10) * 100}%`,
+                    }}
+                  />
+                </div>
+                <div className="gauge-scale-detail">
+                  <div className="gauge-label-detail">0</div>
+                  <div className="gauge-label-detail">2.5</div>
+                  <div className="gauge-label-detail">5</div>
+                  <div className="gauge-label-detail">7.5</div>
+                  <div className="gauge-label-detail">10</div>
+                </div>
+                <p className="score-description-detail">
+                  Your confidence level demonstrates{" "}
+                  <strong>
+                    {performance.class === "excellent" && "outstanding performance"}
+                    {performance.class === "good" && "strong proficiency"}
+                    {performance.class === "fair" && "room for improvement"}
+                    {performance.class === "poor" && "significant growth opportunity"}
+                  </strong>
+                </p>
               </div>
             </div>
           </div>
@@ -67,11 +103,11 @@ const SessionDetailModal = ({ session, onClose }) => {
           <div className="detail-section">
             <h3>Detailed Metrics Breakdown</h3>
             <div className="metrics-breakdown">
-              {Object.entries(session.metrics).map(([key, value]) => (
+              {Object.entries(session.metrics).filter(([key]) => key !== 'Confidence').map(([key, value]) => (
                 <div key={key} className="metric-row">
                   <div className="metric-left">
                     <span className="metric-label">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
-                    <span className="metric-score">{typeof value === 'number' ? value.toFixed(1) : value}</span>
+                    <span className="metric-score">{typeof value === 'number' ? Math.round(value) : value}</span>
                   </div>
                   <div className="metric-bar-container">
                     <div className="metric-bar">
@@ -129,6 +165,7 @@ const SessionDetailModal = ({ session, onClose }) => {
 const SessionHistory = () => {
   const navigate = useNavigate();
   const [selectedSession, setSelectedSession] = useState(null);
+  const [selectedSessionIndex, setSelectedSessionIndex] = useState(null);
   const [sessionsData, setSessionsData] = useState([]);
 
 useEffect(() => {
@@ -171,14 +208,14 @@ useEffect(() => {
           <span className="stat-label">Average Score</span>
 <span className="stat-value">
   {sessionsData.length
-    ? (sessionsData.reduce((sum, s) => sum + s.score, 0) / sessionsData.length).toFixed(1)
+    ? Math.round(sessionsData.reduce((sum, s) => sum + (s.metrics?.Confidence || s.score), 0) / sessionsData.length)
     : "0"}
 </span>        </div>
         <div className="history-stat">
           <span className="stat-label">Best Score</span>
 <span className="stat-value">
   {sessionsData.length
-    ? Math.max(...sessionsData.map(s => s.score)).toFixed(1)
+    ? Math.round(Math.max(...sessionsData.map(s => s.metrics?.Confidence || s.score)))
     : "0"}
 </span>        </div>
       </div>
@@ -187,11 +224,14 @@ useEffect(() => {
       <div className="sessions-history-container">
         <div className="sessions-list">
           {sessionsData.length > 0 ? (
-            sessionsData.map((session) => (
+            sessionsData.map((session, index) => (
               <div 
                 key={session.id} 
                 className="session-list-item"
-                onClick={() => setSelectedSession(session)}
+                onClick={() => {
+                  setSelectedSession(session);
+                  setSelectedSessionIndex(index + 1);
+                }}
                 role="button"
                 tabIndex={0}
               >
@@ -212,18 +252,15 @@ useEffect(() => {
                 {/* Session Info */}
                 <div className="session-list-content">
                   <div className="session-header-info">
-                    <h4 className="session-title">{session.title}</h4>
-                    <span className="session-type-badge">{session.type}</span>
-                  </div>
+                    <h4 className="session-title">{session.title}</h4>                  </div>
                   <p className="session-meta">{session.date} • {session.duration}</p>
-                  <p className="session-status">Status: <span className="status-text">{session.status}</span></p>
                 </div>
 
                 {/* Session Stats */}
                 <div className="session-list-stats">
                   <div className="score-container">
-                    <span className={`score-badge ${session.score >= 8.5 ? 'excellent' : session.score >= 8 ? 'very-good' : 'good'}`}>
-                      {session.score.toFixed(1)}<span className="score-max">/10</span>
+                    <span className={`score-badge ${(session.metrics?.Confidence || session.score) >= 8 ? 'excellent' : (session.metrics?.Confidence || session.score) >= 6 ? 'very-good' : 'good'}`}>
+                      {Math.round(session.metrics?.Confidence || session.score)}<span className="score-max">/10</span>
                     </span>
                     <p className="score-label">Overall Score</p>
                   </div>
@@ -244,7 +281,7 @@ useEffect(() => {
 
       {/* Session Detail Modal */}
       {selectedSession && (
-        <SessionDetailModal session={selectedSession} onClose={() => setSelectedSession(null)} />
+        <SessionDetailModal session={selectedSession} sessionIndex={selectedSessionIndex} onClose={() => setSelectedSession(null)} />
       )}
     </div>
   );

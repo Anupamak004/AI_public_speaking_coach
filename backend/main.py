@@ -30,7 +30,12 @@ app.mount("/videos", StaticFiles(directory="uploaded_videos"), name="videos")
 # ✅ CORS FIX (THIS IS THE KEY PART)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # React dev server
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -81,21 +86,6 @@ def login(user: schemas.LoginSchema, db: Session = Depends(get_db)):
 def root():
     return {"status": "Backend running"}
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:5174",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-
 
 UPLOAD_DIR = "uploaded_videos"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -108,47 +98,60 @@ async def analyze_video(
     user_id: int = Form(...),
     db: Session = Depends(get_db)
 ):
-
-    os.makedirs("uploaded_videos", exist_ok=True)
-
     video_path = f"uploaded_videos/{file.filename}"
 
     with open(video_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    # -------- Get Video Duration --------
+    # -------- duration --------
     cap = cv2.VideoCapture(video_path)
-
     fps = cap.get(cv2.CAP_PROP_FPS)
     frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
-
     duration_seconds = frame_count / fps if fps else 0
-
-    minutes = int(duration_seconds // 60)
-    seconds = int(duration_seconds % 60)
-
-    duration_str = f"{minutes}:{seconds:02d} min"
-
     cap.release()
-    # ------------------------------------
 
-    scores = run_inference(video_path)
+    duration_str = f"{int(duration_seconds//60)}:{int(duration_seconds%60):02d} min"
 
-    overall_score = sum(scores["scores"].values()) / len(scores["scores"])
-
+    # -------- STEP 1: Create session --------
     new_session = models.Session(
         user_id=user_id,
         title="Practice Session",
         video_path=video_path,
-        score=overall_score,
+        score=0,
         duration=duration_str,
-        metrics=json.dumps(scores["scores"]),
-        feedback=json.dumps(scores["feedback"]),
-        suggestions=json.dumps(scores["suggestions"])
+        metrics="{}",
+        feedback="{}",
+        suggestions="[]"
     )
 
     db.add(new_session)
     db.commit()
+    db.refresh(new_session)
+
+    session_id = new_session.id
+
+    # ❗ VERY IMPORTANT: CLOSE DB BEFORE LONG TASK
+    db.close()
+
+    # -------- STEP 2: Run inference --------
+    scores = run_inference(video_path)
+
+    overall_score = sum(scores["scores"].values()) / len(scores["scores"])
+
+    # -------- STEP 3: NEW DB CONNECTION --------
+    db = SessionLocal()
+
+    session = db.query(models.Session).filter(models.Session.id == session_id).first()
+
+    if session:
+        session.score = overall_score
+        session.metrics = json.dumps(scores["scores"])
+        session.feedback = json.dumps(scores["feedback"])
+        session.suggestions = json.dumps(scores["suggestions"])
+
+        db.commit()
+
+    db.close()
 
     return {
         "status": "success",

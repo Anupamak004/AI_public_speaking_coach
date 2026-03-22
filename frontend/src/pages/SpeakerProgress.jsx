@@ -1,222 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
-
-const speakerProgressData = {
-  overview: {
-    totalSessions: 12,
-    averageScore: 8.4,
-    bestScore: 9.5,
-    improvementRate: 15,
-    completionRate: 100
-  },
-  metrics: [
-    {
-      name: "Clarity",
-      score: 8.8,
-      trend: "↑ +2.1%",
-      description: "Speech articulation and pronunciation"
-    },
-    {
-      name: "Pacing",
-      score: 8.2,
-      trend: "↑ +1.8%",
-      description: "Speech speed and rhythm control"
-    },
-    {
-      name: "Confidence",
-      score: 8.6,
-      trend: "↑ +3.2%",
-      description: "Delivery assertiveness and presence"
-    },
-    {
-      name: "Engagement",
-      score: 7.9,
-      trend: "↑ +2.5%",
-      description: "Audience connection and interaction"
-    }
-  ],
-  improvements: [
-    { text: "Reduced filler words by 35%", date: "Last 3 sessions" },
-    { text: "Improved eye contact consistency", date: "Last 2 sessions" },
-    { text: "Better emotion conveyance", date: "Last session" },
-    { text: "Enhanced storytelling flow", date: "Last 2 sessions" },
-    { text: "Clearer pronunciation in technical terms", date: "Consistent" }
-  ],
-  sessionHistory: [
-    {
-      id: 1,
-      title: "Session 12: Advanced Storytelling",
-      date: "Feb 15, 2026",
-      score: 9.1,
-      duration: "8:45 min",
-      status: "Completed",
-      type: "Advanced Storytelling",
-      metrics: {
-        clarity: 9.0,
-        pacing: 8.8,
-        confidence: 9.3,
-        engagement: 8.9,
-        fillerWords: 2,
-        eyeContact: 8.5
-      },
-      feedback: [
-        "Excellent narrative flow and emotional delivery",
-        "Great pauses for emphasis and audience engagement",
-        "Minor filler word usage near the beginning",
-        "Strong conclusion with memorable takeaway"
-      ],
-      improvements: [
-        "Continue practicing storytelling techniques",
-        "Maintain this level of confidence and presence",
-        "Work slightly on minimizing filler words"
-      ]
-    },
-    {
-      id: 2,
-      title: "Session 11: Product Pitch",
-      date: "Feb 12, 2026",
-      score: 8.7,
-      duration: "7:30 min",
-      status: "Completed",
-      type: "Product Pitch",
-      metrics: {
-        clarity: 8.9,
-        pacing: 8.5,
-        confidence: 8.4,
-        engagement: 8.6,
-        fillerWords: 4,
-        eyeContact: 8.1
-      },
-      feedback: [
-        "Clear value proposition presented effectively",
-        "Good product feature explanation",
-        "Pacing could be slightly faster in some sections",
-        "Eye contact improved significantly"
-      ],
-      improvements: [
-        "Practice tighter pacing for product details",
-        "Enhance engagement through more interactive elements",
-        "Continue working on eye contact consistency"
-      ]
-    },
-    {
-      id: 3,
-      title: "Session 10: Public Speaking Basics",
-      date: "Feb 10, 2026",
-      score: 8.3,
-      duration: "9:15 min",
-      status: "Completed",
-      type: "Public Speaking Basics",
-      metrics: {
-        clarity: 8.2,
-        pacing: 7.9,
-        confidence: 8.5,
-        engagement: 8.1,
-        fillerWords: 5,
-        eyeContact: 7.8
-      },
-      feedback: [
-        "Solid foundational delivery",
-        "Good use of body language",
-        "Some improvement needed in pacing consistency",
-        "Strong closing statement"
-      ],
-      improvements: [
-        "Work on reducing filler words (um, uh, etc.)",
-        "Practice varied pacing techniques",
-        "Build more direct eye contact with audience"
-      ]
-    },
-    {
-      id: 4,
-      title: "Session 9: Persuasion Techniques",
-      date: "Feb 08, 2026",
-      score: 8.5,
-      duration: "8:00 min",
-      status: "Completed",
-      type: "Persuasion Techniques",
-      metrics: {
-        clarity: 8.6,
-        pacing: 8.3,
-        confidence: 8.4,
-        engagement: 8.7,
-        fillerWords: 6,
-        eyeContact: 8.0
-      },
-      feedback: [
-        "Effective use of persuasive language",
-        "Good argument structure and flow",
-        "Moderate filler word usage",
-        "Strong audience engagement techniques"
-      ],
-      improvements: [
-        "Reduce filler words for more professional delivery",
-        "Enhance body language gestures",
-        "Practice more natural pauses between key points"
-      ]
-    },
-    {
-      id: 5,
-      title: "Session 8: Introduction Skills",
-      date: "Feb 05, 2026",
-      score: 8.1,
-      duration: "7:45 min",
-      status: "Completed",
-      type: "Introduction Skills",
-      metrics: {
-        clarity: 8.0,
-        pacing: 7.8,
-        confidence: 8.2,
-        engagement: 8.1,
-        fillerWords: 7,
-        eyeContact: 7.6
-      },
-      feedback: [
-        "Good opening hook",
-        "Clear introduction of main points",
-        "Pacing needs some work",
-        "Decent engagement level"
-      ],
-      improvements: [
-        "Work on stronger opening statements",
-        "Practice more controlled pacing",
-        "Increase eye contact frequency"
-      ]
-    }
-  ],
-  scoresTrend: [
-    { session: "S1", score: 6.8 },
-    { session: "S2", score: 7.2 },
-    { session: "S3", score: 7.5 },
-    { session: "S4", score: 7.9 },
-    { session: "S5", score: 8.1 },
-    { session: "S6", score: 8.3 },
-    { session: "S7", score: 8.2 },
-    { session: "S8", score: 8.5 },
-    { session: "S9", score: 8.4 },
-    { session: "S10", score: 8.6 },
-    { session: "S11", score: 8.7 },
-    { session: "S12", score: 9.1 }
-  ]
-};
-
-const ProgressBar = ({ percentage, label }) => {
-  return (
-    <div className="progress-bar-wrapper">
-      <div className="progress-bar-label">
-        <span>{label}</span>
-        <span className="progress-percentage">{percentage}%</span>
-      </div>
-      <div className="progress-bar-container">
-        <div 
-          className="progress-bar-fill" 
-          style={{ width: `${percentage}%` }}
-        ></div>
-      </div>
-    </div>
-  );
-};
 
 const ScoreCircle = ({ score, metric }) => {
   const getColorClass = (score) => {
@@ -239,194 +23,391 @@ const ScoreCircle = ({ score, metric }) => {
 
 const SpeakerProgress = () => {
   const navigate = useNavigate();
-  const maxScore = Math.max(...speakerProgressData.scoresTrend.map(s => s.score));
-  const minScore = Math.min(...speakerProgressData.scoresTrend.map(s => s.score));
-  const scoreRange = maxScore - minScore;
+
+  const [sessions, setSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // ✅ Fetch sessions (FIXED)
+  useEffect(() => {
+    const fetchSessions = async () => {
+      try {
+        // 🔥 GET user_id from stored "user"
+        const user = JSON.parse(localStorage.getItem("user"));
+        const user_id = user?.id;
+
+        console.log("USER ID:", user_id); // debug
+
+        if (!user_id) {
+          console.error("No user_id found");
+          setSessions([]);
+          return;
+        }
+
+        const res = await fetch(`http://127.0.0.1:8000/sessions/${user_id}`);
+        const data = await res.json();
+
+        // ✅ ensure array
+        if (Array.isArray(data)) {
+          setSessions(data);
+        } else {
+          console.error("Unexpected response:", data);
+          setSessions([]);
+        }
+      } catch (err) {
+        console.error("Error fetching sessions:", err);
+        setSessions([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSessions();
+  }, []);
+
+  // ✅ Loading
+  if (loading) return <h2 style={{ padding: "20px" }}>Loading...</h2>;
+
+  // ✅ Safe calculations
+  const totalSessions = Array.isArray(sessions) ? sessions.length : 0;
+
+  const scores = Array.isArray(sessions)
+    ? sessions.map((s) => s.score || 0)
+    : [];
+
+  const averageScore =
+    scores.length > 0
+      ? scores.reduce((a, b) => a + b, 0) / scores.length
+      : 0;
+
+  const bestScore = scores.length > 0 ? Math.max(...scores) : 0;
+
+  const scoresTrend = Array.isArray(sessions)
+    ? sessions
+        .slice()
+        .reverse()
+        .map((s, index) => ({
+          session: `S${index + 1}`,
+          score: s.score || 0,
+        }))
+    : [];
+
+  const latestSession =
+    Array.isArray(sessions) && sessions.length > 0 ? sessions[0] : null;
+
+  const metricsData =
+    latestSession && latestSession.metrics
+      ? Object.entries(latestSession.metrics).map(([key, value]) => ({
+          name: key.charAt(0).toUpperCase() + key.slice(1),
+          score: value,
+        }))
+      : [];
+
+  // ✅ Chart safe - Use fixed 0-10 scale
+  const maxScore = 10;
+  const minScore = 0;
+  const scoreRange = 10;
+
+  const feedbackList = Array.isArray(latestSession?.feedback)
+  ? latestSession.feedback
+  : latestSession?.feedback
+  ? [latestSession.feedback]
+  : [];
+
+  // Helper to generate grid lines and axis labels
+  const generateChartMarkings = () => {
+    const markings = [];
+    const gridLines = [];
+    const yAxisLabels = [];
+    const xAxisLabels = [];
+
+    // Y-axis grid lines and labels (10-point scale)
+    for (let i = 0; i <= 10; i++) {
+      const yPos = 270 - (i / 10) * 180;
+      gridLines.push(
+        <line
+          key={`grid-${i}`}
+          x1="60"
+          y1={yPos}
+          x2="950"
+          y2={yPos}
+          stroke="#e5e7eb"
+          strokeWidth="1"
+          strokeDasharray="4,4"
+        />
+      );
+      yAxisLabels.push(
+        <text
+          key={`y-label-${i}`}
+          x="45"
+          y={yPos + 5}
+          textAnchor="end"
+          fontSize="12"
+          fill="#6b7280"
+          fontWeight="500"
+        >
+          {i}
+        </text>
+      );
+    }
+
+    // X-axis labels
+    scoresTrend.forEach((item, idx) => {
+      const x = 60 + idx * 70;
+      xAxisLabels.push(
+        <text
+          key={`x-label-${idx}`}
+          x={x}
+          y="290"
+          textAnchor="middle"
+          fontSize="12"
+          fill="#6b7280"
+          fontWeight="500"
+        >
+          {item.session}
+        </text>
+      );
+    });
+
+    return { gridLines, yAxisLabels, xAxisLabels };
+  };
+
+  const { gridLines, yAxisLabels, xAxisLabels } = generateChartMarkings();
 
   return (
     <div className="speaker-progress-page">
-      {/* Header Section */}
+      {/* Header */}
       <div className="progress-header">
-        <button className="back-to-dashboard" onClick={() => navigate("/dashboard")}>← Back to Dashboard</button>
+        <button
+          className="back-to-dashboard"
+          onClick={() => navigate("/dashboard")}
+        >
+          ← Back to Dashboard
+        </button>
+
         <div className="progress-header-content">
           <h1>Speaker Progress Dashboard</h1>
           <p className="header-subtitle">
-            Track your journey to becoming a master speaker with detailed analytics and personalized feedback
+            Track your speaking improvement with detailed analytics
           </p>
         </div>
       </div>
 
-      {/* Top Stats Cards */}
+      {/* Stats */}
       <div className="stats-grid-4">
         <div className="stat-card-primary">
-          <div className="stat-icon">📊</div>
-          <div className="stat-card-content">
+          <div className="stat-content">
             <h3>Total Sessions</h3>
-            <p className="stat-value">{speakerProgressData.overview.totalSessions}</p>
-            <span className="stat-subtext">Professional training sessions completed</span>
+            <p className="stat-value">{totalSessions}</p>
+            <p className="stat-subtext">practice sessions completed</p>
           </div>
         </div>
 
         <div className="stat-card-primary">
-          <div className="stat-icon">⭐</div>
-          <div className="stat-card-content">
+          <div className="stat-content">
             <h3>Average Score</h3>
-            <p className="stat-value">{speakerProgressData.overview.averageScore.toFixed(1)}</p>
-            <span className="stat-subtext">Out of 10 throughout all sessions</span>
+            <p className="stat-value">{averageScore.toFixed(1)}</p>
+            <p className="stat-subtext">out of 10</p>
           </div>
         </div>
 
         <div className="stat-card-primary">
-          <div className="stat-icon">🏆</div>
-          <div className="stat-card-content">
+          <div className="stat-content">
             <h3>Best Score</h3>
-            <p className="stat-value">{speakerProgressData.overview.bestScore.toFixed(1)}</p>
-            <span className="stat-subtext">Your highest achievement yet</span>
+            <p className="stat-value">{bestScore.toFixed(1)}</p>
+            <p className="stat-subtext">your peak performance</p>
           </div>
         </div>
 
         <div className="stat-card-primary">
-          <div className="stat-icon">📈</div>
-          <div className="stat-card-content">
-            <h3>Improvement</h3>
-            <p className="stat-value">+{speakerProgressData.overview.improvementRate}%</p>
-            <span className="stat-subtext">Overall progress increase</span>
+          <div className="stat-content">
+            <h3>Latest Score</h3>
+            <p className="stat-value">
+              {latestSession ? latestSession.score.toFixed(1) : "-"}
+            </p>
+            <p className="stat-subtext">most recent session</p>
           </div>
         </div>
       </div>
 
-      {/* Performance Metrics Section */}
+      {/* Metrics */}
       <section className="performance-section">
-        <h2>Performance Metrics</h2>
-        <p className="section-description">Detailed breakdown of your speaking skills across key dimensions</p>
-        
+        <div className="section-header">
+          <h2>Performance Metrics</h2>
+          <p className="section-description">
+            Detailed breakdown of your speaking abilities
+          </p>
+        </div>
+
         <div className="metrics-grid">
-          {speakerProgressData.metrics.map((metric, idx) => (
-            <div key={idx} className="metric-card">
-              <div className="metric-header">
-                <h3>{metric.name}</h3>
-                <span className="metric-trend positive">{metric.trend}</span>
+          {metricsData.length > 0 ? (
+            metricsData.map((metric, idx) => (
+              <div key={idx} className="metric-card">
+                <ScoreCircle score={metric.score} metric={metric.name} />
+                <p className="metric-description">
+                  {metric.name} performance
+                </p>
               </div>
-              <ScoreCircle score={metric.score} metric={metric.name} />
-              <p className="metric-description">{metric.description}</p>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="no-data-message">No metrics available yet. Complete a session to see detailed metrics.</p>
+          )}
         </div>
       </section>
 
-      {/* Score Trend Chart */}
+      {/* Chart */}
       <section className="trend-section">
-        <h2>Score Progression Over Time</h2>
-        <p className="section-description">Your performance growth across all sessions</p>
-        
+        <div className="section-header">
+          <h2>Score Progression</h2>
+          <p className="section-description">
+            Your performance trend over time
+          </p>
+        </div>
+
         <div className="chart-container">
-          <div className="chart-canvas">
-            <svg viewBox="0 0 1000 300" className="trend-chart">
-              {/* Grid Lines */}
-              {[0, 2, 4, 6].map((i) => (
-                <line 
-                  key={`grid-${i}`}
-                  x1="60" 
-                  y1={50 + i * 40} 
-                  x2="950" 
-                  y2={50 + i * 40} 
-                  stroke="#e5e7eb" 
-                  strokeWidth="1"
-                />
-              ))}
+          {scoresTrend.length > 0 ? (
+            <svg viewBox="0 0 1000 350" className="trend-chart">
+              {/* Title */}
+              <text
+                x="500"
+                y="25"
+                textAnchor="middle"
+                fontSize="14"
+                fill="#1a365d"
+                fontWeight="600"
+              >
+                Performance Over Time
+              </text>
 
-              {/* Y-axis labels */}
-              <text x="40" y="255" fontSize="12" fill="#666" textAnchor="end">6</text>
-              <text x="40" y="215" fontSize="12" fill="#666" textAnchor="end">7</text>
-              <text x="40" y="175" fontSize="12" fill="#666" textAnchor="end">8</text>
-              <text x="40" y="135" fontSize="12" fill="#666" textAnchor="end">9</text>
-              <text x="40" y="95" fontSize="12" fill="#666" textAnchor="end">10</text>
+              {/* Y-axis label */}
+              <text
+                x="20"
+                y="180"
+                textAnchor="middle"
+                fontSize="12"
+                fill="#6b7280"
+                fontWeight="500"
+              >
+                Score
+              </text>
 
-              {/* Axes */}
+              {/* X-axis label */}
+              <text
+                x="500"
+                y="330"
+                textAnchor="middle"
+                fontSize="12"
+                fill="#6b7280"
+                fontWeight="500"
+              >
+                Sessions
+              </text>
+
+              {/* Grid lines */}
+              {gridLines}
+
+              {/* Y-axis */}
               <line x1="60" y1="50" x2="60" y2="270" stroke="#333" strokeWidth="2" />
+
+              {/* X-axis */}
               <line x1="60" y1="270" x2="950" y2="270" stroke="#333" strokeWidth="2" />
 
-              {/* Plot line and points */}
+              {/* Y-axis labels */}
+              {yAxisLabels}
+
+              {/* X-axis labels */}
+              {xAxisLabels}
+
+              {/* Data line with gradient */}
+              <defs>
+                <linearGradient id="gradientLine" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#4f46e5" />
+                  <stop offset="100%" stopColor="#667eea" />
+                </linearGradient>
+              </defs>
+
+              {/* Polyline chart */}
               <polyline
-                points={speakerProgressData.scoresTrend.map((item, idx) => {
-                  const x = 60 + (idx * 70);
-                  const normalizedScore = (item.score - minScore) / scoreRange;
-                  const y = 270 - (normalizedScore * 180);
-                  return `${x},${y}`;
-                }).join(" ")}
+                points={scoresTrend
+                  .map((item, idx) => {
+                    const x = 60 + idx * 70;
+                    const y =
+                      270 - ((item.score - minScore) / scoreRange) * 180;
+                    return `${x},${y}`;
+                  })
+                  .join(" ")}
                 fill="none"
-                stroke="#4f46e5"
+                stroke="url(#gradientLine)"
                 strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
 
               {/* Data points */}
-              {speakerProgressData.scoresTrend.map((item, idx) => {
-                const x = 60 + (idx * 70);
-                const normalizedScore = (item.score - minScore) / scoreRange;
-                const y = 270 - (normalizedScore * 180);
+              {scoresTrend.map((item, idx) => {
+                const x = 60 + idx * 70;
+                const y =
+                  270 - ((item.score - minScore) / scoreRange) * 180;
+
                 return (
-                  <circle 
-                    key={`point-${idx}`}
-                    cx={x} 
-                    cy={y} 
-                    r="5" 
-                    fill="#4f46e5"
-                  />
+                  <g key={idx}>
+                    <circle cx={x} cy={y} r="6" fill="white" stroke="#4f46e5" strokeWidth="2" />
+                    <circle cx={x} cy={y} r="3" fill="#4f46e5" />
+                    {/* Score label above point */}
+                    <text
+                      x={x}
+                      y={y - 15}
+                      textAnchor="middle"
+                      fontSize="12"
+                      fill="#4f46e5"
+                      fontWeight="600"
+                    >
+                      {Math.round(item.score)}
+                    </text>
+                    {/* Tooltips on hover */}
+                    <title>{`${item.session}: ${Math.round(item.score)}/10`}</title>
+                  </g>
                 );
               })}
-
-              {/* X-axis labels */}
-              {speakerProgressData.scoresTrend.map((item, idx) => (
-                <text 
-                  key={`label-${idx}`}
-                  x={60 + (idx * 70)} 
-                  y="295" 
-                  fontSize="11" 
-                  fill="#666" 
-                  textAnchor="middle"
-                >
-                  {item.session}
-                </text>
-              ))}
             </svg>
-          </div>
+          ) : (
+            <p className="no-data-message">No session data available. Complete a session to see your progress.</p>
+          )}
         </div>
       </section>
 
-      {/* Improvements Section */}
+      {/* Feedback */}
       <section className="improvements-section">
-        <h2>Key Improvements</h2>
-        <p className="section-description">Notable progress areas identified during your sessions</p>
-        
-        <div className="improvements-list">
-          {speakerProgressData.improvements.map((improvement, idx) => (
-            <div key={idx} className="improvement-item">
-              <div className="improvement-icon">✓</div>
-              <div className="improvement-content">
-                <p className="improvement-text">{improvement.text}</p>
-                <span className="improvement-date">{improvement.date}</span>
-              </div>
-            </div>
-          ))}
+        <div className="section-header">
+          <h2>Latest Feedback</h2>
+          <p className="section-description">
+            Personalized recommendations from your most recent session
+          </p>
         </div>
-      </section>
 
-      {/* Next Steps Section */}
-      <section className="next-steps-section">
-        <h2>Recommended Next Steps</h2>
-        <div className="next-steps-grid">
-          <div className="next-step-card">
-            <h3>🎯 Focus Area: Engagement</h3>
-            <p>Work on improving audience engagement. Try incorporating more pauses and interactive elements in your presentations.</p>
-          </div>
-          <div className="next-step-card">
-            <h3>📚 Master Advanced Techniques</h3>
-            <p>You're doing great! Consider diving into advanced storytelling and emotional intelligence modules.</p>
-          </div>
-          <div className="next-step-card">
-            <h3>🎬 Record Your Next Session</h3>
-            <p>Schedule your next speaking session to continue building on your excellent progress.</p>
-          </div>
+        <div className="improvements-list">
+          {feedbackList.length > 0 ? (
+            feedbackList.map((f, idx) => (
+              <div key={idx} className="improvement-item">
+                <div className="improvement-icon">✓</div>
+                <div className="improvement-content">
+                  {typeof f === "object" ? (
+                    <div>
+                      {Object.entries(f).map(([key, value], i) => (
+                        <div key={i} className="feedback-entry">
+                          <strong className="feedback-label">{key}:</strong>
+                          <span className="feedback-value">{value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p>{f}</p>
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="no-data-message">No feedback available. Complete a session to receive recommendations.</p>
+          )}
         </div>
       </section>
     </div>
