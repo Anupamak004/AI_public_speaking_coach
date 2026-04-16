@@ -89,8 +89,8 @@ def run_inference(video_path: str):
         "text": text_res
     }
 
-    feedback_data = generate_feedback(results)
+    feedback_data = generate_feedback(results, audio_res, video_res, text_res)
     return {
         "scores": results,
-        **feedback_data
+        "feedback": feedback_data
     }

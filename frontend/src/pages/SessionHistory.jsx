@@ -126,15 +126,55 @@ const SessionDetailModal = ({ session, sessionIndex, onClose }) => {
           <div className="detail-section">
             <h3>AI Feedback Analysis</h3>
             <div className="feedback-list">
-              {Array.isArray(session.feedback) &&
-  session.feedback.map((item, idx) => (
-    <div key={idx} className="feedback-item">
-      <span className="feedback-icon">💡</span>
-      <span className="feedback-text">{item}</span>
-    </div>
-))}
-            </div>
+  {session.feedback && Object.entries(session.feedback).map(([key, value], idx) => {
+    if (typeof value === "string") {
+      return (
+        <div key={idx} className="feedback-item">
+          <span className="feedback-icon">💡</span>
+          <span className="feedback-text">
+            <strong>{key}:</strong> {value}
+          </span>
+        </div>
+      );
+    }
+
+    if (typeof value === "object" && value.advice) {
+      return (
+        <div key={idx} className="feedback-item">
+          <span className="feedback-icon">💡</span>
+          <span className="feedback-text">
+            <strong>{key}:</strong> {value.advice}
+          </span>
+        </div>
+      );
+    }
+
+    return null;
+  })}
+</div>
           </div>
+
+          {session.feedback?.strengths && (
+  <div className="detail-section">
+    <h3>Strengths</h3>
+    <ul>
+      {session.feedback.strengths.map((s, i) => (
+        <li key={i}>✅ {s}</li>
+      ))}
+    </ul>
+  </div>
+)}
+
+{session.feedback?.weaknesses && (
+  <div className="detail-section">
+    <h3>Weaknesses</h3>
+    <ul>
+      {session.feedback.weaknesses.map((w, i) => (
+        <li key={i}>⚠ {w}</li>
+      ))}
+    </ul>
+  </div>
+)}
 
           {/* Recommendations */}
           <div className="detail-section">
@@ -178,7 +218,7 @@ useEffect(() => {
 
   const user = JSON.parse(storedUser);
 
-  fetch(`http://localhost:8000/sessions/${user.id}`)
+fetch(`http://localhost:8000/sessions/${user.id}`)
     .then(res => res.json())
     .then(data => setSessionsData(data))
     .catch(err => console.error(err));
@@ -208,9 +248,14 @@ useEffect(() => {
           <span className="stat-label">Average Score</span>
 <span className="stat-value">
   {sessionsData.length
-    ? Math.round(sessionsData.reduce((sum, s) => sum + (s.metrics?.Confidence || s.score), 0) / sessionsData.length)
-    : "0"}
-</span>        </div>
+    ? (
+        sessionsData.reduce(
+          (sum, s) => sum + (s.metrics?.Confidence || s.score),
+          0
+        ) / sessionsData.length
+      ).toFixed(1)   // 👈 shows 1 decimal (e.g., 7.6)
+    : "0.0"}
+</span>       </div>
         <div className="history-stat">
           <span className="stat-label">Best Score</span>
 <span className="stat-value">

@@ -8,6 +8,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [scores, setScores] = useState([]);
   const [feedback, setFeedback] = useState({});
+  const [comprehensiveFeedback, setComprehensiveFeedback] = useState({});
   const [suggestions, setSuggestions] = useState([]);
 
   const handleAnalyze = async () => {
@@ -18,10 +19,11 @@ export default function Dashboard() {
 
   try {
     const user = JSON.parse(localStorage.getItem("user"));
+    console.log("USER:", user);
 
 const formData = new FormData();
 formData.append("file", videoFile);
-formData.append("user_id", user.id); // send user id
+formData.append("user_id", String(user.id));
 
     const response = await fetch("http://localhost:8000/analyze", {
       method: "POST",
@@ -29,12 +31,19 @@ formData.append("user_id", user.id); // send user id
     });
 
     const data = await response.json();
-    console.log("Backend response:", data);
+
+if (!response.ok) {
+  console.error("Backend error:", data);
+console.error("FULL ERROR:", JSON.stringify(data, null, 2));
+throw new Error("Backend error");}
+
+console.log("Backend response:", data);
 
     // ✅ SAFETY CHECK
-    if (!data || !data.scores || !data.scores.scores) {
-      throw new Error("Invalid backend response");
-    }
+    if (!data?.scores?.scores) {
+  console.error("Unexpected structure:", data);
+  throw new Error("Invalid backend response");
+}
 
     // ✅ FIXED HERE
     const formattedScores = Object.entries(data.scores.scores).map(
@@ -46,6 +55,7 @@ formData.append("user_id", user.id); // send user id
 
     setScores(formattedScores);
     setFeedback(data.scores.feedback || {});
+    setComprehensiveFeedback(data.scores.feedback || {});
     setSuggestions(data.scores.suggestions || []);
     setAnalyzed(true);
 
@@ -292,8 +302,60 @@ formData.append("user_id", user.id); // send user id
               </div>
             )}
 
-            {/* SUGGESTIONS */}
-            {suggestions.length > 0 && (
+            {/* FEEDBACK SECTIONS */}
+            {comprehensiveFeedback.overall_feedback && (
+              <section className="feedback-section">
+                <h2 className="feedback-header">Overall Feedback</h2>
+                <div className="feedback-content">
+                  <p className="overall-feedback-text">{comprehensiveFeedback.overall_feedback}</p>
+                </div>
+              </section>
+            )}
+
+            {/* STRENGTHS */}
+            {comprehensiveFeedback.strengths && comprehensiveFeedback.strengths.length > 0 && (
+              <section className="feedback-section">
+                <h2 className="feedback-header" style={{color: "#059669"}}>Strengths</h2>
+                <div className="feedback-content">
+                  <ul className="feedback-list">
+                    {comprehensiveFeedback.strengths.map((strength, idx) => (
+                      <li key={idx} className="strength-item">✓ {strength}</li>
+                    ))}
+                  </ul>
+                </div>
+              </section>
+            )}
+
+            {/* WEAKNESSES */}
+            {comprehensiveFeedback.weaknesses && comprehensiveFeedback.weaknesses.length > 0 && (
+              <section className="feedback-section">
+                <h2 className="feedback-header" style={{color: "#dc2626"}}>Areas Needing Attention</h2>
+                <div className="feedback-content">
+                  <ul className="feedback-list">
+                    {comprehensiveFeedback.weaknesses.map((weakness, idx) => (
+                      <li key={idx} className="weakness-item">⚠ {weakness}</li>
+                    ))}
+                  </ul>
+                </div>
+              </section>
+            )}
+
+            {/* AREAS TO IMPROVE */}
+            {comprehensiveFeedback.areas_to_improve && comprehensiveFeedback.areas_to_improve.length > 0 && (
+              <section className="feedback-section">
+                <h2 className="feedback-header" style={{color: "#2563eb"}}>Improvement Recommendations</h2>
+                <div className="feedback-content">
+                  <ul className="feedback-list">
+                    {comprehensiveFeedback.areas_to_improve.map((area, idx) => (
+                      <li key={idx} className="improvement-item">💡 {area}</li>
+                    ))}
+                  </ul>
+                </div>
+              </section>
+            )}
+
+            {/* LEGACY SUGGESTIONS - for backward compatibility */}
+            {suggestions.length > 0 && !comprehensiveFeedback.areas_to_improve && (
               <section className="suggestions-section">
                 <h2 className="suggestions-header">
                   Personalized Coaching Tips

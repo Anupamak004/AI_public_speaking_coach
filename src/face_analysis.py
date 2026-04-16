@@ -11,7 +11,9 @@ class FaceAnalysis:
     """
     def __init__(self):
         """Initialize MediaPipe Face Landmarker."""
-        base_options = python.BaseOptions(model_asset_path='src/models/face_landmarker.task')
+        # Use absolute path to model file
+        model_path = os.path.join(os.path.dirname(__file__), 'models', 'face_landmarker.task')
+        base_options = python.BaseOptions(model_asset_path=model_path)
         options = vision.FaceLandmarkerOptions(
             base_options=base_options,
             output_face_blendshapes=True,

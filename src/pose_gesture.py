@@ -10,7 +10,8 @@ class PoseGestureAnalysis:
     Analyzes body pose and gestures using MediaPipe Tasks API.
     """
     def __init__(self):
-        base_options = python.BaseOptions(model_asset_path='src/models/pose_landmarker_full.task')
+        model_path = os.path.join(os.path.dirname(__file__), 'models', 'pose_landmarker_full.task')
+        base_options = python.BaseOptions(model_asset_path=model_path)
         options = vision.PoseLandmarkerOptions(
             base_options=base_options,
             num_poses=1

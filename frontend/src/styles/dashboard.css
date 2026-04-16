@@ -598,6 +598,118 @@ video {
     box-shadow: 0 8px 25px rgba(79, 70, 229, 0.1);
 }
 
+/* ========== NEW FEEDBACK SECTIONS ========== */
+
+.feedback-section {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+}
+
+.feedback-header {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a365d;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.feedback-content {
+    line-height: 1.6;
+}
+
+.overall-feedback-text {
+    font-size: 1.1rem;
+    color: #374151;
+    margin-bottom: 0;
+    font-weight: 500;
+}
+
+.feedback-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.feedback-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 1rem;
+    color: #374151;
+    line-height: 1.5;
+}
+
+.feedback-list li:last-child {
+    border-bottom: none;
+}
+
+.strength-item {
+    color: #059669;
+    font-weight: 500;
+}
+
+.weakness-item {
+    color: #dc2626;
+    font-weight: 500;
+}
+
+.improvement-item {
+    color: #2563eb;
+    font-weight: 500;
+}
+
+/* Legacy suggestions styles */
+.suggestions-section {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    margin-top: 24px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+}
+
+.suggestions-header {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a365d;
+    margin-bottom: 20px;
+}
+
+.suggestions-container {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.suggestions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.suggestions-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 1rem;
+    color: #374151;
+    line-height: 1.5;
+}
+
+.suggestions-list li:last-child {
+    border-bottom: none;
+}
+
+.suggestions-list li:before {
+    content: "💡";
+    margin-right: 10px;
+    font-size: 1.1rem;
+}
+
 .metric-header {
     display: flex;
     justify-content: space-between;
@@ -822,6 +934,114 @@ video {
 
 .history-header h2 {
     margin-bottom: 8px;
+}
+
+/* Section */
+.feedback-section {
+    margin-top: 30px;
+    padding: 24px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #f9fafb, #eef2ff);
+}
+
+/* Header */
+.feedback-header h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.feedback-header p {
+    color: #6b7280;
+    margin-top: 4px;
+    font-size: 0.95rem;
+}
+
+/* Container */
+.feedback-container {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Card */
+.feedback-card {
+    display: flex;
+    gap: 16px;
+    padding: 18px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(10px);
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+.feedback-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Left Badge */
+.feedback-left {
+    display: flex;
+    align-items: center;
+}
+
+.feedback-badge {
+    background: linear-gradient(135deg, #6366f1, #22c55e);
+    color: white;
+    font-weight: 600;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+}
+
+/* Body */
+.feedback-body {
+    flex: 1;
+}
+
+/* Rows (for object feedback) */
+.feedback-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.feedback-key {
+    font-weight: 600;
+    color: #374151;
+}
+
+.feedback-value {
+    color: #111827;
+}
+
+/* Text */
+.feedback-text {
+    font-size: 0.95rem;
+    color: #1f2937;
+    line-height: 1.5;
+}
+
+/* Empty State */
+.no-feedback {
+    text-align: center;
+    padding: 30px;
+    border-radius: 16px;
+    background: #ffffff;
+    border: 1px dashed #d1d5db;
+}
+
+.no-feedback p {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.no-feedback span {
+    color: #6b7280;
+    font-size: 0.9rem;
 }
 
 /* Sessions List View */
@@ -3104,6 +3324,27 @@ input[type="checkbox"]:checked+.slider:before {
     opacity: 0.95;
     line-height: 1.4;
     margin-top: 4px;
+}
+
+.metric-growth {
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+.metric-growth.positive {
+    color: #16a34a;
+    /* green */
+}
+
+.metric-growth.negative {
+    color: #dc2626;
+    /* red */
+}
+
+.metric-growth.neutral {
+    color: #6b7280;
+    /* gray */
 }
 
 /* Responsive Design for Modal */

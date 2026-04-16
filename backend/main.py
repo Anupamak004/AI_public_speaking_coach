@@ -147,7 +147,7 @@ async def analyze_video(
         session.score = overall_score
         session.metrics = json.dumps(scores["scores"])
         session.feedback = json.dumps(scores["feedback"])
-        session.suggestions = json.dumps(scores["suggestions"])
+        session.suggestions = json.dumps(scores["feedback"].get("areas_to_improve", []))
 
         db.commit()
 

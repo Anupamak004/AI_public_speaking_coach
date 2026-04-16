@@ -3,7 +3,12 @@ import json
 import librosa
 import numpy as np
 from moviepy import VideoFileClip
-import webrtcvad
+
+try:
+    import webrtcvad
+except ImportError:
+    webrtcvad = None
+
 import whisper_timestamped as whisper
 
 
@@ -53,13 +58,21 @@ def run_filler_pipeline(video_path, output_dir):
     # ==================================================
     print("🎧 Detecting fillers from audio...")
 
-    vad = webrtcvad.Vad(2)
     frame_ms = 30
     frame_len = int(sr * frame_ms / 1000)
 
-    def is_voiced(frame):
-        pcm = (frame * 32767).astype(np.int16).tobytes()
-        return vad.is_speech(pcm, sr)
+    if webrtcvad is not None:
+        vad = webrtcvad.Vad(2)
+
+        def is_voiced(frame):
+            pcm = (frame * 32767).astype(np.int16).tobytes()
+            return vad.is_speech(pcm, sr)
+    else:
+        print("⚠️ webrtcvad not installed; using RMS fallback for voice detection")
+
+        def is_voiced(frame):
+            rms = np.sqrt(np.mean(frame ** 2))
+            return rms > 0.003
 
     filler_segments = []
     t = 0
